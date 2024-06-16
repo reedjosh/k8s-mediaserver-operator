@@ -1,0 +1,51 @@
+ingress_host: k8s-mediaserver.k8s.test
+image_tag: latest
+podDistribution: cluster # can be "spread" or "cluster"
+#UID to run the process with
+puid: 1000
+# GID to run the process with
+pgid: 1000
+# Persistent storage selections and pathing
+storage:
+  customVolume: false # set to true if not using a PVC (must provide volume below)
+  pvcName: mediaserver-pvc
+  accessMode: ""
+  size: 5Gi
+  pvcStorageClass: ""
+  # the path starting from the top level of the pv you're passing. If your share is server.local/share/, then tv is server.local/share/media/tv
+  subPaths:
+    config: config
+  volumes: {}
+  #  hostPath:
+  #    path: /mnt/share
+ingress:
+  ingressClassName: ""
+nodeSelector: {}
+
+container:
+  image: docker.io/linuxserver/jackett
+  nodeSelector: {}
+  port: 9117
+service:
+  type: ClusterIP
+  port: 9117
+  nodePort:
+  extraLBService: false
+  extraLBAnnotations: {}
+  # Defines an additional LB service, requires cloud provider service or MetalLB
+ingress:
+  enabled: true
+  annotations: {}
+  path: /jackett
+  tls:
+    enabled: false
+    secretName: ""
+resources: {}
+volume: {}
+#  name: pvc-jackett-config
+#  storageClassName: longhorn
+#  annotations: {}
+#  labels: {}
+#  accessModes: ReadWriteOnce
+#  storage: 5Gi
+#  selector: {}

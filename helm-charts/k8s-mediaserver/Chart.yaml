@@ -9,3 +9,7 @@ dependencies:
   version: ^0.10.0
   repository: "file://./jellyfin/"
   condition: jellyfin.enabled
+- name: k8s-jackett
+  version: ^0.10.0
+  repository: "file://./jackett/"
+  condition: jackett.enabled

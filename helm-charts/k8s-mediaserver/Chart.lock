@@ -1,0 +1,9 @@
+dependencies:
+- name: k8s-jellyfin
+  repository: file://./jellyfin/
+  version: 0.10.0
+- name: k8s-jackett
+  repository: file://./jackett/
+  version: 0.10.0
+digest: sha256:08f35f18e757217416e5e307c4b5df1f2d1719a80553a5603f250f0ed1689d98
+generated: "2024-06-16T15:37:19.453842-05:00"
