@@ -35,7 +35,7 @@ general:
   nodeSelector: {}
 
 sonarr:
-  enabled: true
+  enabled: false
   container:
     image: docker.io/linuxserver/sonarr
     nodeSelector: {}
@@ -67,7 +67,7 @@ sonarr:
   # selector: {}
 
 radarr:
-  enabled: true
+  enabled: false
   container:
     image: docker.io/linuxserver/radarr
     nodeSelector: {}
@@ -127,7 +127,7 @@ jackett:
   #  selector: {}
 
 transmission:
-  enabled: true
+  enabled: false
   container:
     image: docker.io/linuxserver/transmission
     nodeSelector: {}
@@ -175,7 +175,7 @@ transmission:
   #  selector: {}
 
 sabnzbd:
-  enabled: true
+  enabled: false
   container:
     image: docker.io/linuxserver/sabnzbd
     nodeSelector: {}
@@ -215,7 +215,7 @@ sabnzbd:
   #  selector: {}
 
 prowlarr:
-  enabled: true
+  enabled: false
   container:
     image: docker.io/linuxserver/prowlarr
     tag: develop
@@ -282,7 +282,7 @@ plex:
   #  selector: {}
 
 jellyfin:
-  enabled: false
+  enabled: true
   replicaCount: 1
   container:
     image: docker.io/linuxserver/jellyfin

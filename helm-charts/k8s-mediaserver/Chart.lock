@@ -5,5 +5,8 @@ dependencies:
 - name: k8s-jackett
   repository: file://./jackett/
   version: 0.10.0
-digest: sha256:08f35f18e757217416e5e307c4b5df1f2d1719a80553a5603f250f0ed1689d98
-generated: "2024-06-16T15:37:19.453842-05:00"
+- name: k8s-plex
+  repository: file://./plex/
+  version: 0.10.0
+digest: sha256:f9b1d4762d5acd0346bb4467b158bdd6648ba6e5f4d8e60e10b6308027070281
+generated: "2024-06-16T15:51:38.763191-05:00"

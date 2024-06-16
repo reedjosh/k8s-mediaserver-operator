@@ -13,3 +13,7 @@ dependencies:
   version: ^0.10.0
   repository: "file://./jackett/"
   condition: jackett.enabled
+- name: k8s-plex
+  version: ^0.10.0
+  repository: "file://./plex/"
+  condition: plex.enabled
