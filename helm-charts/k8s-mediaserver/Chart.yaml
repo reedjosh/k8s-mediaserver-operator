@@ -4,3 +4,8 @@ description: A Helm chart for Kubernetes mediaserver
 name: k8s-mediaserver
 type: application
 version: 0.10.0
+dependencies:
+- name: k8s-jellyfin
+  version: ^0.10.0
+  repository: "file://./jellyfin/"
+  condition: jellyfin.enabled

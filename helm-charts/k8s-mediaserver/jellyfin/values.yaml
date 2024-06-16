@@ -1,0 +1,60 @@
+
+jellyfin_ingress_host: k8s-jelly.k8s.test
+image_tag: latest
+#UID to run the process with
+puid: 1000
+# GID to run the process with
+pgid: 1000
+
+# Persistent storage selections and pathing
+storage:
+  customVolume: false # set to true if not using a PVC (must provide volume below)
+  pvcName: mediaserver-pvc
+  accessMode: ""
+  size: 5Gi
+  pvcStorageClass: ""
+  # the path starting from the top level of the pv you're passing. If your share is server.local/share/, then tv is server.local/share/media/tv
+  subPaths:
+    tv: media/tv
+    movies: media/movies
+    config: config
+  volumes: {}
+  #  hostPath:
+  #    path: /mnt/share
+ingress:
+  ingressClassName: ""
+nodeSelector: {}
+
+
+replicaCount: 1
+container:
+  image: docker.io/linuxserver/jellyfin
+  nodeSelector: {}
+  port: 8096
+service:
+  type: ClusterIP
+  port: 8096
+  nodePort:
+  # Defines an additional LB service, requires cloud provider service or MetalLB
+  extraLBService: false
+ingress:
+  enabled: true
+  annotations: {}
+  tls:
+    enabled: false
+    secretName: ""
+resources: {}
+#  limits:
+#    cpu: 100m
+#    memory: 100Mi
+#  requests:
+#    cpu: 100m
+#    memory: 100Mi
+volume: {}
+#  name: pvc-jellyfin-config
+#  storageClassName: longhorn
+#  annotations: {}
+#  labels: {}
+#  accessModes: ReadWriteOnce
+#  storage: 5Gi
+#  selector: {}

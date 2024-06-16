@@ -1,4 +1,3 @@
-{{ if .Values.jellyfin.enabled }}
 ---
 ### CONFIGMAP
 apiVersion: v1
@@ -6,8 +5,8 @@ kind: ConfigMap
 metadata:
   name: jellyfin-config
 data:
-  PGID: "{{ .Values.general.pgid }}"
-  PUID: "{{ .Values.general.puid }}"  
+  PGID: "{{ .Values.pgid }}"
+  PUID: "{{ .Values.puid }}"  
 ---
 ### DEPLOYMENT
 apiVersion: apps/v1
@@ -17,7 +16,7 @@ metadata:
   labels:
     {{- include "k8s-mediaserver.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.jellyfin.replicaCount }}
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "k8s-mediaserver.selectorLabels" . | nindent 6 }}
@@ -28,55 +27,55 @@ spec:
         app: jellyfin
     spec:
       volumes:
-        {{- if not .Values.general.storage.customVolume }}
+        {{- if not .Values.storage.customVolume }}
         - name: mediaserver-volume
           persistentVolumeClaim:
-            claimName: {{ .Values.general.storage.pvcName }}
+            claimName: {{ .Values.storage.pvcName }}
         {{- else }}
         - name: mediaserver-volume
-          {{- toYaml .Values.general.storage.volumes | nindent 10 }}
+          {{- toYaml .Values.storage.volumes | nindent 10 }}
         {{- end }}
-        {{- if .Values.jellyfin.volume }}
-        - name: {{ .Values.jellyfin.volume.name }}
+        {{- if .Values.volume }}
+        - name: {{ .Values.volume.name }}
           persistentVolumeClaim:
-            claimName: {{ .Values.jellyfin.volume.name }}
+            claimName: {{ .Values.volume.name }}
         {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           envFrom:
             - configMapRef:
                 name: jellyfin-config
-          image: "{{ .Values.jellyfin.container.image }}:{{ .Values.jellyfin.container.tag | default .Values.general.image_tag }}"
+          image: "{{ .Values.container.image }}:{{ .Values.container.tag | default .Values.image_tag }}"
           imagePullPolicy: Always
           readinessProbe:
             tcpSocket:
-              port: {{ .Values.jellyfin.container.port }}
+              port: {{ .Values.container.port }}
             initialDelaySeconds: 20
             periodSeconds: 15
           ports:
             - name: jellyfin-port
-              containerPort: {{ .Values.jellyfin.container.port }}
+              containerPort: {{ .Values.container.port }}
               protocol: TCP
           volumeMounts:
-          {{- if .Values.jellyfin.volume }}
-            - name: {{ .Values.jellyfin.volume.name }}
+          {{- if .Values.volume }}
+            - name: {{ .Values.volume.name }}
               mountPath: /config
           {{- else }}
             - name: mediaserver-volume
               mountPath: /config
-              subPath: "{{ .Values.general.storage.subPaths.config }}/jellyfin"
+              subPath: "{{ .Values.storage.subPaths.config }}/jellyfin"
           {{- end }}
             - name: mediaserver-volume
               mountPath: /movies
-              subPath: "{{ .Values.general.storage.subPaths.movies }}"
+              subPath: "{{ .Values.storage.subPaths.movies }}"
             - name: mediaserver-volume
               mountPath: /tv
-              subPath: "{{ .Values.general.storage.subPaths.tv }}"
-          {{- with .Values.jellyfin.resources }}
+              subPath: "{{ .Values.storage.subPaths.tv }}"
+          {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.general.nodeSelector }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -89,33 +88,33 @@ metadata:
   labels:
     {{- include "k8s-mediaserver.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.jellyfin.service.type }}
+  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.jellyfin.service.port }}
-      targetPort: {{ .Values.jellyfin.container.port }}
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.container.port }}
       protocol: TCP
       name: jellyfin-port
-{{ if eq .Values.jellyfin.service.type "NodePort" }}
-      nodePort: {{ .Values.jellyfin.service.nodePort }}
+{{ if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.nodePort }}
 {{ end }}
   selector:
     app: jellyfin
 
 ---
-{{ if .Values.jellyfin.service.extraLBService }}
+{{ if .Values.service.extraLBService }}
 apiVersion: v1
 kind: Service
 metadata:
   name: jellyfin-lb
   annotations:
-    {{- include .Values.jellyfin.service.extraLBService.annotations . | nindent 4 }}
+    {{- include .Values.service.extraLBService.annotations . | nindent 4 }}
   labels:
     {{- include "k8s-mediaserver.labels" . | nindent 4 }}
 spec:
   type: LoadBalancer
   ports:
-    - port: {{ .Values.jellyfin.service.port }}
-      targetPort: {{ .Values.jellyfin.container.port }}
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.container.port }}
       protocol: TCP
       name: jellyfin-port
   selector:
@@ -123,27 +122,27 @@ spec:
 {{ end }}
 ---
 ### INGRESS
-{{ if .Values.jellyfin.ingress.enabled }}
+{{ if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: jellyfin
   labels:
     {{- include "k8s-mediaserver.labels" . | nindent 4 }}
-  {{- with .Values.jellyfin.ingress.annotations }}
+  {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-{{- if .Values.jellyfin.ingress.tls.enabled }}
+{{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:
-        - {{ .Values.general.jellyfin_ingress_host | quote }}
-      secretName: {{ .Values.jellyfin.ingress.tls.secretName }}
+        - {{ .Values.jellyfin_ingress_host | quote }}
+      secretName: {{ .Values.ingress.tls.secretName }}
 {{ end }}
-  ingressClassName: {{ .Values.general.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
-    - host: {{ .Values.general.jellyfin_ingress_host | quote }}
+    - host: {{ .Values.jellyfin_ingress_host | quote }}
       http:
         paths:
           - path: /
@@ -152,6 +151,32 @@ spec:
               service:
                 name: jellyfin
                 port:
-                  number: {{ .Values.jellyfin.service.port }}
+                  number: {{ .Values.service.port }}
 {{ end }}
-{{ end }}
+{{- with .Values.volume }}
+---
+### PERSISTENTVOLUMECLAIM
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .name }}
+  {{ with .annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{ with .labels }}
+  labels:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    - {{ .accessModes }}
+  resources:
+    requests:
+      storage: {{ .storage }}
+  storageClassName: {{ .storageClassName }}
+  {{ with .selector }}
+  selector:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
