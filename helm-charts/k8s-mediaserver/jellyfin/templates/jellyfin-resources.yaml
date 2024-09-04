@@ -69,7 +69,7 @@ spec:
               subPath: "{{ .Values.global.storage.subPaths.movies }}"
             - name: mediaserver-volume
               mountPath: /books
-              subPath: "/books"
+              subPath: media/books
             - name: mediaserver-volume
               mountPath: /tv
               subPath: "{{ .Values.global.storage.subPaths.tv }}"
